@@ -9,7 +9,12 @@
     "start": "tsx proxy/src/server.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "contracts:install": "pnpm --dir contracts install",
+    "contracts:compile": "pnpm --dir contracts compile",
+    "contracts:test": "pnpm --dir contracts test",
+    "contracts:deploy:hardhat": "pnpm --dir contracts deploy:hardhat",
+    "contracts:deploy:sepolia": "pnpm --dir contracts deploy:sepolia"
   },
   "engines": {
     "node": ">=20.0.0"

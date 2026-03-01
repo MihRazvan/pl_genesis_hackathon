@@ -2,7 +2,7 @@
 
 Privacy-preserving Ethereum RPC proxy for the PL Genesis hackathon.
 
-## Milestone 1 status
+## Milestone status
 
 Implemented:
 - TypeScript RPC proxy (`POST /`) with upstream fallback
@@ -10,8 +10,12 @@ Implemented:
 - Health endpoint (`GET /health`)
 - Automated tests for forwarding/fallback/error paths
 - Manual smoke script
+- Hardhat fhEVM project in `contracts/`
+- `PrivateQueryLog` contract with encrypted per-user query counts
+- fhEVM mock test proving encrypted write + authorized decrypt
+- Deploy scripts for local hardhat and Sepolia
 
-## Quick start
+## Proxy quick start
 
 ```bash
 pnpm install
@@ -26,7 +30,24 @@ In another terminal:
 ./scripts/smoke-proxy.sh
 ```
 
-## Config
+## Contracts quick start (Hardhat + fhEVM)
+
+```bash
+pnpm contracts:install
+pnpm contracts:compile
+pnpm contracts:test
+pnpm contracts:deploy:hardhat
+```
+
+For Sepolia deployment:
+
+```bash
+cp contracts/.env.example contracts/.env
+# set DEPLOYER_PRIVATE_KEY in contracts/.env
+pnpm contracts:deploy:sepolia
+```
+
+## Config (proxy)
 
 - `PORT` (default: `8547`)
 - `UPSTREAM_RPC_URLS` (comma-separated)

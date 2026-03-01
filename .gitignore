@@ -4,3 +4,7 @@ pnpm-lock.yaml
 .env.local
 .DS_Store
 coverage
+contracts/.env
+contracts/artifacts
+contracts/cache
+contracts/fhevmTemp
