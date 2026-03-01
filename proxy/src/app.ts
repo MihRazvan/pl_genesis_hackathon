@@ -1,5 +1,7 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import { resolveTimeoutMs, resolveUpstreamUrls } from "./config.js";
+import { isJsonRpcRequest } from "./jsonRpc.js";
+import { createQueryLogger, type QueryLogger } from "./queryLogger.js";
 
 type FetchLike = typeof fetch;
 
@@ -7,29 +9,15 @@ type BuildAppOptions = {
   fetchImpl?: FetchLike;
   upstreamUrls?: string[];
   timeoutMs?: number;
+  queryLogger?: QueryLogger;
 };
-
-type JsonRpcRequest = {
-  jsonrpc?: string;
-  method?: string;
-  params?: unknown;
-  id?: unknown;
-};
-
-function isJsonRpcRequest(payload: unknown): payload is JsonRpcRequest {
-  if (!payload || typeof payload !== "object") {
-    return false;
-  }
-
-  const value = payload as Record<string, unknown>;
-  return typeof value.method === "string";
-}
 
 export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
   const app = Fastify({ logger: true });
   const fetchImpl = options.fetchImpl ?? fetch;
   const upstreamUrls = options.upstreamUrls ?? resolveUpstreamUrls();
   const timeoutMs = options.timeoutMs ?? resolveTimeoutMs();
+  const queryLogger = options.queryLogger ?? createQueryLogger(app.log);
 
   app.get("/health", async () => ({
     ok: true,
@@ -79,6 +67,12 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
         }
 
         const json = await upstreamResponse.json();
+        try {
+          queryLogger?.logRequest(payload);
+        } catch (error) {
+          const reason = error instanceof Error ? error.message : String(error);
+          request.log.error({ error: reason, method }, "Query logger failed before enqueue");
+        }
         return reply.code(200).send(json);
       } catch (error) {
         const reason = error instanceof Error ? error.message : String(error);

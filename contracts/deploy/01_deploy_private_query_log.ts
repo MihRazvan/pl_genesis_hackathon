@@ -6,13 +6,16 @@ const deployPrivateQueryLog: DeployFunction = async function (
 ) {
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
+  const loggerAddress = process.env.PROXY_LOGGER_ADDRESS ?? deployer;
 
   const deployment = await deploy("PrivateQueryLog", {
     from: deployer,
+    args: [loggerAddress],
     log: true
   });
 
   console.log(`PrivateQueryLog deployed at: ${deployment.address}`);
+  console.log(`Authorized logger: ${loggerAddress}`);
 };
 
 export default deployPrivateQueryLog;

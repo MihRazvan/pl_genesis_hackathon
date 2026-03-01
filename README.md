@@ -14,6 +14,7 @@ Implemented:
 - `PrivateQueryLog` contract with encrypted per-user query counts
 - fhEVM mock test proving encrypted write + authorized decrypt
 - Deploy scripts for local hardhat and Sepolia
+- Proxy integration for non-blocking on-chain query logging
 
 ## Proxy quick start
 
@@ -23,6 +24,13 @@ cp .env.example .env
 pnpm test
 pnpm dev
 ```
+
+To enable on-chain logging in the proxy, set these in `.env`:
+- `QUERY_LOG_ENABLED=true`
+- `QUERY_LOG_RPC_URL=<sepolia_rpc_url>`
+- `QUERY_LOG_PRIVATE_KEY=<proxy_logger_wallet_private_key>`
+- `QUERY_LOG_CONTRACT_ADDRESS=<deployed_PrivateQueryLog_address>`
+- `QUERY_LOG_CONFIRMATIONS=0` (or higher if you want confirmation waits)
 
 In another terminal:
 
@@ -52,5 +60,10 @@ pnpm contracts:deploy:sepolia
 - `PORT` (default: `8547`)
 - `UPSTREAM_RPC_URLS` (comma-separated)
 - `REQUEST_TIMEOUT_MS` (default: `10000`)
+- `QUERY_LOG_ENABLED` (default: `false`)
+- `QUERY_LOG_RPC_URL` (RPC used to send logging txs)
+- `QUERY_LOG_PRIVATE_KEY` (wallet used by proxy to log on-chain)
+- `QUERY_LOG_CONTRACT_ADDRESS` (deployed `PrivateQueryLog` contract)
+- `QUERY_LOG_CONFIRMATIONS` (confirmations to wait for each logging tx)
 
 Default upstreams are Sepolia public endpoints for no-key MVP testing.

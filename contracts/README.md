@@ -7,6 +7,7 @@ This folder contains the Zama fhEVM contract project used by the Private RPC pro
 - `PrivateQueryLog.sol`
 - Stores encrypted query counts per user address.
 - Uses `@fhevm/solidity` and Zama network config.
+- Includes `incrementQueryCountFor(address user, uint32 delta)` for proxy-side logging by an authorized logger wallet.
 
 ## Prerequisites
 
@@ -42,6 +43,8 @@ cp contracts/.env.example contracts/.env
 
 - Set `DEPLOYER_PRIVATE_KEY` to your Sepolia deployer private key.
 - Optionally override `SEPOLIA_RPC_URL` (default is publicnode).
+- Optional: set `PROXY_LOGGER_ADDRESS` to the proxy wallet address allowed to call
+  `incrementQueryCountFor`. If omitted, deployer is used.
 
 3. Deploy:
 
