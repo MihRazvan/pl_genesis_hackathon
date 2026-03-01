@@ -1,0 +1,26 @@
+{
+  "name": "private-rpc-proxy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Privacy-preserving Ethereum RPC proxy for hackathon MVP",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch proxy/src/server.ts",
+    "start": "tsx proxy/src/server.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "fastify": "^5.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
