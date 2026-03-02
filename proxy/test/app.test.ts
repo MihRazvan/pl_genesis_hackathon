@@ -23,10 +23,12 @@ describe("RPC proxy", () => {
         headers: { "content-type": "application/json" }
       })
     );
+    const queryLogger = { logRequest: vi.fn() };
 
     const app = buildApp({
       fetchImpl: fetchMock,
-      upstreamUrls: ["https://first.example"]
+      upstreamUrls: ["https://first.example"],
+      queryLogger
     });
 
     const response = await app.inject({
@@ -39,6 +41,7 @@ describe("RPC proxy", () => {
     expect(response.json()).toEqual({ jsonrpc: "2.0", id: 1, result: "0xabc" });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls[0]?.[0]).toBe("https://first.example");
+    expect(queryLogger.logRequest).toHaveBeenCalledTimes(1);
     await app.close();
   });
 
@@ -87,10 +90,12 @@ describe("RPC proxy", () => {
 
   it("returns 502 when all upstreams fail", async () => {
     const fetchMock = vi.fn<typeof fetch>().mockRejectedValue(new Error("network down"));
+    const queryLogger = { logRequest: vi.fn() };
 
     const app = buildApp({
       fetchImpl: fetchMock,
-      upstreamUrls: ["https://first.example", "https://second.example"]
+      upstreamUrls: ["https://first.example", "https://second.example"],
+      queryLogger
     });
 
     const response = await app.inject({
@@ -101,6 +106,38 @@ describe("RPC proxy", () => {
 
     expect(response.statusCode).toBe(502);
     expect(response.json().error.code).toBe(-32000);
+    expect(queryLogger.logRequest).not.toHaveBeenCalled();
+    await app.close();
+  });
+
+  it("still returns upstream response when query logger throws synchronously", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ jsonrpc: "2.0", id: 4, result: "0x1" }), {
+        status: 200,
+        headers: { "content-type": "application/json" }
+      })
+    );
+    const queryLogger = {
+      logRequest: vi.fn(() => {
+        throw new Error("logger boom");
+      })
+    };
+
+    const app = buildApp({
+      fetchImpl: fetchMock,
+      upstreamUrls: ["https://first.example"],
+      queryLogger
+    });
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/",
+      payload: { jsonrpc: "2.0", id: 4, method: "eth_blockNumber", params: [] }
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ jsonrpc: "2.0", id: 4, result: "0x1" });
+    expect(queryLogger.logRequest).toHaveBeenCalledTimes(1);
     await app.close();
   });
 });

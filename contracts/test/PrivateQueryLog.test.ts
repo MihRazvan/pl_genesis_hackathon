@@ -10,7 +10,7 @@ describe("PrivateQueryLog", function () {
 
     const [alice] = await ethers.getSigners();
     const factory = await ethers.getContractFactory("PrivateQueryLog");
-    const contract = await factory.deploy();
+    const contract = await factory.deploy(alice.address);
     const contractAddress = await contract.getAddress();
 
     const encryptedOne = await fhevm
@@ -30,6 +30,29 @@ describe("PrivateQueryLog", function () {
       encryptedCount,
       contractAddress,
       alice
+    );
+
+    expect(clearCount).to.eq(1);
+  });
+
+  it("allows logger to increment another user count", async function () {
+    if (!fhevm.isMock) {
+      this.skip();
+    }
+
+    const [logger, bob] = await ethers.getSigners();
+    const factory = await ethers.getContractFactory("PrivateQueryLog");
+    const contract = await factory.deploy(logger.address);
+    const contractAddress = await contract.getAddress();
+
+    await (await contract.connect(logger).incrementQueryCountFor(bob.address, 1)).wait();
+
+    const encryptedCount = await contract.getEncryptedQueryCount(bob.address);
+    const clearCount = await fhevm.userDecryptEuint(
+      FhevmType.euint32,
+      encryptedCount,
+      contractAddress,
+      bob
     );
 
     expect(clearCount).to.eq(1);
