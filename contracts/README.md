@@ -5,9 +5,9 @@ This folder contains the Zama fhEVM contract project used by the Private RPC pro
 ## Contract
 
 - `PrivateQueryLog.sol`
-- Stores encrypted query counts per user address.
+- Stores encrypted query counts per pseudonymous bucket ID (`bytes32`).
 - Uses `@fhevm/solidity` and Zama network config.
-- Includes `incrementQueryCountFor(address user, uint32 delta)` for proxy-side logging by an authorized logger wallet.
+- Includes `incrementQueryCountForUserBucket(bytes32 userBucketId, uint32 delta)` for proxy-side logging by an authorized logger wallet.
 
 ## Prerequisites
 

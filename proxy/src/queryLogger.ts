@@ -1,4 +1,4 @@
-import { Contract, JsonRpcProvider, Transaction, Wallet, isAddress } from "ethers";
+import { Contract, JsonRpcProvider, Transaction, Wallet, id, isAddress } from "ethers";
 import type { FastifyBaseLogger } from "fastify";
 import type { JsonRpcRequest } from "./jsonRpc.js";
 
@@ -11,13 +11,16 @@ type LoggerConfig = {
   rpcUrl?: string;
   privateKey?: string;
   contractAddress?: string;
+  userSalt?: string;
   confirmations: number;
   flushMs: number;
   batchMax: number;
   methods: string[];
 };
 
-const PRIVATE_QUERY_LOG_ABI = ["function incrementQueryCountFor(address user, uint32 delta)"];
+const PRIVATE_QUERY_LOG_ABI = [
+  "function incrementQueryCountForUserBucket(bytes32 userBucketId, uint32 delta)"
+];
 
 const DEFAULT_METHODS = ["eth_sendRawTransaction", "eth_getTransactionReceipt", "eth_getTransactionCount"];
 
@@ -31,7 +34,8 @@ class OnchainQueryLogger implements QueryLogger {
   private readonly contract: Contract;
   private readonly loggerAddress: string;
   private readonly methodAllowlist: Set<string>;
-  private readonly pendingByUser = new Map<string, number>();
+  private readonly userSalt: string;
+  private readonly pendingByUserBucket = new Map<string, number>();
 
   private pendingTotal = 0;
   private flushTimer: NodeJS.Timeout | undefined;
@@ -42,6 +46,7 @@ class OnchainQueryLogger implements QueryLogger {
     rpcUrl: string,
     privateKey: string,
     contractAddress: string,
+    userSalt: string,
     private readonly confirmations: number,
     private readonly flushMs: number,
     private readonly batchMax: number,
@@ -51,6 +56,7 @@ class OnchainQueryLogger implements QueryLogger {
     const wallet = new Wallet(privateKey, provider);
     this.loggerAddress = wallet.address;
     this.contract = new Contract(contractAddress, PRIVATE_QUERY_LOG_ABI, wallet);
+    this.userSalt = userSalt;
     this.methodAllowlist = new Set(methods);
   }
 
@@ -61,11 +67,11 @@ class OnchainQueryLogger implements QueryLogger {
       return;
     }
 
-    const user = extractUserAddress(payload) ?? this.loggerAddress;
-    const current = this.pendingByUser.get(user) ?? 0;
+    const userBucketId = computeUserBucketId(payload, this.userSalt, this.loggerAddress);
+    const current = this.pendingByUserBucket.get(userBucketId) ?? 0;
     const next = Math.min(current + 1, 0xffffffff);
 
-    this.pendingByUser.set(user, next);
+    this.pendingByUserBucket.set(userBucketId, next);
     this.pendingTotal += 1;
 
     if (this.pendingTotal >= this.batchMax) {
@@ -95,20 +101,20 @@ class OnchainQueryLogger implements QueryLogger {
       this.flushTimer = undefined;
     }
 
-    if (this.pendingByUser.size === 0) {
+    if (this.pendingByUserBucket.size === 0) {
       return;
     }
 
-    const batch = Array.from(this.pendingByUser.entries());
-    this.pendingByUser.clear();
+    const batch = Array.from(this.pendingByUserBucket.entries());
+    this.pendingByUserBucket.clear();
     this.pendingTotal = 0;
 
     this.queue = this.queue
       .then(async () => {
-        for (const [user, delta] of batch) {
+        for (const [userBucketId, delta] of batch) {
           try {
-            const tx = await this.contract.incrementQueryCountFor(user, delta);
-            this.log.info({ user, delta, txHash: tx.hash }, "Queued batched on-chain query log");
+            const tx = await this.contract.incrementQueryCountForUserBucket(userBucketId, delta);
+            this.log.info({ userBucketId, delta, txHash: tx.hash }, "Queued batched on-chain query log");
 
             if (this.confirmations > 0) {
               await tx.wait(this.confirmations);
@@ -116,7 +122,7 @@ class OnchainQueryLogger implements QueryLogger {
             }
           } catch (error: unknown) {
             const reason = error instanceof Error ? error.message : String(error);
-            this.log.error({ error: reason, user, delta }, "Failed to write batched on-chain query log");
+            this.log.error({ error: reason, userBucketId, delta }, "Failed to write batched on-chain query log");
           }
         }
       })
@@ -175,11 +181,17 @@ function resolveLoggerConfigFromEnv(): LoggerConfig {
     rpcUrl: process.env.QUERY_LOG_RPC_URL,
     privateKey: process.env.QUERY_LOG_PRIVATE_KEY,
     contractAddress: process.env.QUERY_LOG_CONTRACT_ADDRESS,
+    userSalt: process.env.QUERY_LOG_USER_SALT,
     confirmations,
     flushMs,
     batchMax,
     methods
   };
+}
+
+function computeUserBucketId(payload: JsonRpcRequest, userSalt: string, loggerAddress: string): string {
+  const user = extractUserAddress(payload)?.toLowerCase() ?? loggerAddress.toLowerCase();
+  return id(`${userSalt}:${user}`);
 }
 
 function extractUserAddress(payload: JsonRpcRequest): string | undefined {
@@ -222,14 +234,17 @@ export function createQueryLogger(log: FastifyBaseLogger): QueryLogger {
     return new NoopQueryLogger();
   }
 
-  if (!config.rpcUrl || !config.privateKey || !config.contractAddress) {
+  if (!config.rpcUrl || !config.privateKey || !config.contractAddress || !config.userSalt) {
     throw new Error(
-      "QUERY_LOG_ENABLED=true requires QUERY_LOG_RPC_URL, QUERY_LOG_PRIVATE_KEY, and QUERY_LOG_CONTRACT_ADDRESS"
+      "QUERY_LOG_ENABLED=true requires QUERY_LOG_RPC_URL, QUERY_LOG_PRIVATE_KEY, QUERY_LOG_CONTRACT_ADDRESS, and QUERY_LOG_USER_SALT"
     );
   }
 
   if (!isAddress(config.contractAddress)) {
     throw new Error("Invalid QUERY_LOG_CONTRACT_ADDRESS");
+  }
+  if (config.userSalt.length < 16) {
+    throw new Error("QUERY_LOG_USER_SALT must be at least 16 characters");
   }
 
   const onchainLogger = new OnchainQueryLogger(
@@ -237,6 +252,7 @@ export function createQueryLogger(log: FastifyBaseLogger): QueryLogger {
     config.rpcUrl,
     config.privateKey,
     config.contractAddress,
+    config.userSalt,
     config.confirmations,
     config.flushMs,
     config.batchMax,
@@ -251,6 +267,7 @@ export function createQueryLogger(log: FastifyBaseLogger): QueryLogger {
       flushMs: config.flushMs,
       batchMax: config.batchMax,
       methods: onchainLogger.getAllowedMethods(),
+      userSaltConfigured: true,
       rpcUrl: config.rpcUrl
     },
     "On-chain query logging enabled"
