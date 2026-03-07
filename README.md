@@ -31,6 +31,9 @@ To enable on-chain logging in the proxy, set these in `.env`:
 - `QUERY_LOG_PRIVATE_KEY=<proxy_logger_wallet_private_key>`
 - `QUERY_LOG_CONTRACT_ADDRESS=<deployed_PrivateQueryLog_address>`
 - `QUERY_LOG_CONFIRMATIONS=0` (or higher if you want confirmation waits)
+- `QUERY_LOG_METHODS=eth_sendRawTransaction,eth_getTransactionReceipt,eth_getTransactionCount`
+- `QUERY_LOG_FLUSH_MS=5000`
+- `QUERY_LOG_BATCH_MAX=20`
 
 In another terminal:
 
@@ -65,5 +68,8 @@ pnpm contracts:deploy:sepolia
 - `QUERY_LOG_PRIVATE_KEY` (wallet used by proxy to log on-chain)
 - `QUERY_LOG_CONTRACT_ADDRESS` (deployed `PrivateQueryLog` contract)
 - `QUERY_LOG_CONFIRMATIONS` (confirmations to wait for each logging tx)
+- `QUERY_LOG_METHODS` (comma-separated allowlist of RPC methods to log)
+- `QUERY_LOG_FLUSH_MS` (buffer window before sending batched logs)
+- `QUERY_LOG_BATCH_MAX` (flush early when queued logged requests reach this size)
 
 Default upstreams are Sepolia public endpoints for no-key MVP testing.
