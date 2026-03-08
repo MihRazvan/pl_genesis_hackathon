@@ -3,7 +3,7 @@ import { ethers, fhevm } from "hardhat";
 import { FhevmType } from "@fhevm/hardhat-plugin";
 
 describe("PrivateQueryLog", function () {
-  it("stores encrypted query count by user bucket and lets logger decrypt", async function () {
+  it("stores encrypted query count by user bucket without granting logger decrypt rights", async function () {
     if (!fhevm.isMock) {
       this.skip();
     }
@@ -16,14 +16,21 @@ describe("PrivateQueryLog", function () {
 
     await (await contract.connect(logger).incrementQueryCountForUserBucket(userBucketId, 2)).wait();
     const encryptedCount = await contract.getEncryptedQueryCount(userBucketId);
-    const clearCount = await fhevm.userDecryptEuint(
-      FhevmType.euint32,
-      encryptedCount,
-      contractAddress,
-      logger
-    );
+    expect(encryptedCount).to.not.eq(ethers.ZeroHash);
 
-    expect(clearCount).to.eq(2);
+    let loggerDecryptFailed = false;
+    try {
+      await fhevm.userDecryptEuint(
+        FhevmType.euint32,
+        encryptedCount,
+        contractAddress,
+        logger
+      );
+    } catch {
+      loggerDecryptFailed = true;
+    }
+
+    expect(loggerDecryptFailed).to.eq(true);
   });
 
   it("rejects non-logger writes", async function () {

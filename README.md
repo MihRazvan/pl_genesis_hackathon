@@ -12,7 +12,7 @@ Implemented:
 - Manual smoke script
 - Hardhat fhEVM project in `contracts/`
 - `PrivateQueryLog` contract with encrypted per-user query counts
-- fhEVM mock test proving encrypted write + authorized decrypt
+- fhEVM mock test proving encrypted write + write-only logger permissions
 - Deploy scripts for local hardhat and Sepolia
 - Proxy integration for non-blocking on-chain query logging
 
@@ -75,3 +75,10 @@ pnpm contracts:deploy:sepolia
 - `QUERY_LOG_BATCH_MAX` (flush early when queued logged requests reach this size)
 
 Default upstreams are Sepolia public endpoints for no-key MVP testing.
+
+## Trust model
+
+- The proxy can see live incoming traffic (`IP`, request payload, timing) while forwarding.
+- Upstream RPC no longer sees direct wallet-to-provider traffic; it sees proxy-origin traffic.
+- On-chain logs store encrypted counts keyed by pseudonymous `userBucketId`, not raw wallet address.
+- The logger wallet is write-only for encrypted counts and is not granted decrypt permission in contract ACL.

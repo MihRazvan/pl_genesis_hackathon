@@ -33,8 +33,8 @@ contract PrivateQueryLog is ZamaEthereumConfig {
         euint32 encryptedDelta = FHE.asEuint32(delta);
         _queryCountByBucketId[userBucketId] = FHE.add(_queryCountByBucketId[userBucketId], encryptedDelta);
 
+        // Write-only logger model: proxy can update encrypted state but cannot decrypt it.
         FHE.allowThis(_queryCountByBucketId[userBucketId]);
-        FHE.allow(_queryCountByBucketId[userBucketId], logger);
 
         emit QueryBucketIncremented(userBucketId, delta);
     }

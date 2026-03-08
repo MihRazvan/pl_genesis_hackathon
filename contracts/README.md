@@ -44,7 +44,7 @@ cp contracts/.env.example contracts/.env
 - Set `DEPLOYER_PRIVATE_KEY` to your Sepolia deployer private key.
 - Optionally override `SEPOLIA_RPC_URL` (default is publicnode).
 - Optional: set `PROXY_LOGGER_ADDRESS` to the proxy wallet address allowed to call
-  `incrementQueryCountFor`. If omitted, deployer is used.
+  `incrementQueryCountForUserBucket`. If omitted, deployer is used.
 
 3. Deploy:
 
