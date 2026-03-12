@@ -9,16 +9,20 @@ contract PrivateQueryLog is ZamaEthereumConfig {
     error InvalidUserBucketId();
 
     mapping(bytes32 => euint32) private _queryCountByBucketId;
+    mapping(bytes32 => bool) private _bucketSeen;
+    uint256 public totalBuckets;
     address public immutable logger;
 
-    event QueryBucketIncremented(bytes32 indexed userBucketId, uint32 delta);
+    event QueryBucketIncremented(bytes32 indexed userBucketId);
 
     constructor(address logger_) {
         require(logger_ != address(0), "logger=0");
         logger = logger_;
     }
 
-    function getEncryptedQueryCount(bytes32 userBucketId) external view returns (euint32) {
+    /// @notice Returns the encrypted handle for a bucket count, not plaintext.
+    /// @dev Returned ciphertext is not decryptable by the logger in write-only mode.
+    function getEncryptedQueryCountHandle(bytes32 userBucketId) external view returns (euint32) {
         return _queryCountByBucketId[userBucketId];
     }
 
@@ -32,10 +36,14 @@ contract PrivateQueryLog is ZamaEthereumConfig {
 
         euint32 encryptedDelta = FHE.asEuint32(delta);
         _queryCountByBucketId[userBucketId] = FHE.add(_queryCountByBucketId[userBucketId], encryptedDelta);
+        if (!_bucketSeen[userBucketId]) {
+            _bucketSeen[userBucketId] = true;
+            totalBuckets += 1;
+        }
 
         // Write-only logger model: proxy can update encrypted state but cannot decrypt it.
         FHE.allowThis(_queryCountByBucketId[userBucketId]);
 
-        emit QueryBucketIncremented(userBucketId, delta);
+        emit QueryBucketIncremented(userBucketId);
     }
 }
