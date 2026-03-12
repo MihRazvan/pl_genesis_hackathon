@@ -42,6 +42,26 @@ In another terminal:
 ./scripts/smoke-proxy.sh
 ```
 
+## Demo artifacts
+
+Capture a reproducible before/after evidence bundle:
+
+```bash
+pnpm demo:before-after
+```
+
+This writes files under `demo/evidence/<timestamp>/`:
+- direct RPC request/response captures (`before_direct_*`)
+- proxy RPC request/response captures (`after_proxy_*`)
+- proxy health snapshot
+- contract state snapshot (`logger`, `totalBuckets`, recent events)
+
+Inspect contract state directly anytime:
+
+```bash
+pnpm state:contract
+```
+
 ## Contracts quick start (Hardhat + fhEVM)
 
 ```bash
@@ -78,8 +98,18 @@ Default upstreams are Sepolia public endpoints for no-key MVP testing.
 
 ## Trust model
 
-- The proxy can see live incoming traffic (`IP`, request payload, timing) while forwarding.
-- Upstream RPC no longer sees direct wallet-to-provider traffic; it sees proxy-origin traffic.
-- On-chain logs store encrypted counts keyed by pseudonymous `userBucketId`, not raw wallet address.
-- The logger wallet is write-only for encrypted counts and is not granted decrypt permission in contract ACL.
+What is protected:
+- Upstream RPC cannot directly observe user-to-provider connections; it only sees proxy-origin traffic.
+- On-chain logging does not store raw wallet addresses, only salted pseudonymous `userBucketId`.
+- Logger is write-only for encrypted counts; contract ACL does not grant logger decrypt rights.
+- Public observers can see that a bucket was incremented, but not plaintext encrypted counts.
+
+What is not protected:
+- The proxy can still observe live traffic metadata (`IP`, request payload, timing) while forwarding.
+- Wallet telemetry outside RPC path (for example wallet analytics endpoints) is outside this proxy's control.
+- Upstream still sees forwarded RPC payload content from the proxy itself (transport identity is improved, payload confidentiality is not).
+
+Why this model:
+- This project prioritizes unlinkability and surveillance-risk reduction (prevent easy IP->wallet dossier accumulation) rather than claiming full anonymity.
+- The design intentionally separates write authority from read authority: proxy can log encrypted operational data but cannot decrypt accumulated history.
 - Contract exposes `totalBuckets` as a privacy-safe aggregate metric for demo visibility.
