@@ -50,6 +50,14 @@ Capture a reproducible before/after evidence bundle:
 pnpm demo:before-after
 ```
 
+Run a full pre-demo sanity check (tests, typecheck, local proxy smoke check, optional contract state, evidence capture):
+
+```bash
+pnpm demo:check
+```
+
+`demo:check` auto-loads `.env` (if present). For the on-chain state step, set `QUERY_LOG_CONTRACT_ADDRESS` and `QUERY_LOG_RPC_URL` (or `SEPOLIA_RPC_URL`).
+
 This writes files under `demo/evidence/<timestamp>/`:
 - direct RPC request/response captures (`before_direct_*`)
 - proxy RPC request/response captures (`after_proxy_*`)
