@@ -7,6 +7,10 @@
   "scripts": {
     "dev": "tsx watch proxy/src/server.ts",
     "start": "tsx proxy/src/server.ts",
+    "site:dev": "vite --config site/vite.config.ts",
+    "site:build": "vite build --config site/vite.config.ts",
+    "site:preview": "vite preview --config site/vite.config.ts",
+    "site:typecheck": "tsc -p site/tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
@@ -23,13 +27,22 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@fontsource/fraunces": "^5.2.9",
+    "@fontsource/space-grotesk": "^5.2.10",
     "ethers": "^6.16.0",
-    "fastify": "^5.6.1"
+    "fastify": "^5.6.1",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
     "@types/node": "^24.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.3",
+    "vite": "^8.0.0",
     "vitest": "^3.2.4"
   }
 }

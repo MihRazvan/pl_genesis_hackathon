@@ -10,11 +10,21 @@ Implemented:
 - Health endpoint (`GET /health`)
 - Automated tests for forwarding/fallback/error paths
 - Manual smoke script
+- React + Vite landing page for judges and wallet onboarding
 - Hardhat fhEVM project in `contracts/`
 - `PrivateQueryLog` contract with encrypted pseudonymous-bucket query counts
 - fhEVM mock test proving encrypted write + write-only logger permissions
 - Deploy scripts for local hardhat and Sepolia
 - Proxy integration for non-blocking on-chain query logging
+
+## Landing page quick start
+
+```bash
+pnpm site:dev
+pnpm site:build
+```
+
+The landing page lives in `site/` and is currently wired with placeholder RPC values for deployment later.
 
 ## Proxy quick start
 

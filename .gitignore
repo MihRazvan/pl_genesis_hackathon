@@ -5,6 +5,7 @@ pnpm-lock.yaml
 .DS_Store
 coverage
 demo/evidence
+site/dist
 contracts/.env
 contracts/artifacts
 contracts/cache
