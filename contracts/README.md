@@ -1,6 +1,6 @@
-# Contracts (fhEVM)
+# Cloakline Contracts (fhEVM)
 
-This folder contains the Zama fhEVM contract project used by the Private RPC proxy.
+This folder contains the Zama fhEVM contract project used by Cloakline.
 
 ## Contract
 

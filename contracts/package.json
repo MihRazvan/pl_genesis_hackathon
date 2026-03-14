@@ -1,8 +1,8 @@
 {
-  "name": "private-rpc-contracts",
+  "name": "cloakline-contracts",
   "version": "0.1.0",
   "private": true,
-  "description": "fhEVM contracts for Private RPC",
+  "description": "fhEVM contracts for Cloakline",
   "scripts": {
     "clean": "hardhat clean",
     "compile": "hardhat compile",

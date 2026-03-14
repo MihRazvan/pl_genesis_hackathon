@@ -58,12 +58,12 @@ else
   fi
 
   echo "[3/6] Starting proxy at ${PROXY_URL}"
-  PORT="${PORT}" QUERY_LOG_ENABLED="${logger_enabled}" pnpm start >/tmp/private-rpc-demo-check.log 2>&1 &
+  PORT="${PORT}" QUERY_LOG_ENABLED="${logger_enabled}" pnpm start >/tmp/cloakline-demo-check.log 2>&1 &
   PROXY_PID=$!
 
   if ! wait_for_proxy; then
     echo "Proxy failed to start. Last logs:" >&2
-    tail -n 100 /tmp/private-rpc-demo-check.log >&2 || true
+    tail -n 100 /tmp/cloakline-demo-check.log >&2 || true
     exit 1
   fi
 fi

@@ -41,7 +41,7 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
     const method = payload.method;
     const sanitizedHeaders: HeadersInit = {
       "content-type": "application/json",
-      "user-agent": "private-rpc-proxy/0.1"
+      "user-agent": "cloakline/0.1"
     };
 
     const errors: string[] = [];

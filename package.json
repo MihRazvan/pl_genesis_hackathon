@@ -1,8 +1,8 @@
 {
-  "name": "private-rpc-proxy",
+  "name": "cloakline",
   "version": "0.1.0",
   "private": true,
-  "description": "Privacy-preserving Ethereum RPC proxy for hackathon MVP",
+  "description": "Cloakline: privacy-preserving Ethereum RPC for unlinkability and write-only encrypted logging",
   "type": "module",
   "scripts": {
     "dev": "tsx watch proxy/src/server.ts",

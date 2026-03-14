@@ -1,6 +1,6 @@
-# Private RPC (Hackathon MVP)
+# Cloakline
 
-Privacy-preserving Ethereum RPC proxy for the PL Genesis hackathon.
+Cloakline is a privacy-preserving Ethereum RPC for the PL Genesis hackathon.
 
 ## Milestone status
 

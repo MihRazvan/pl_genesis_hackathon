@@ -7,7 +7,7 @@ async function startServer(): Promise<void> {
 
   try {
     await app.listen({ port, host: "0.0.0.0" });
-    app.log.info({ port }, "Private RPC proxy listening");
+    app.log.info({ port }, "Cloakline proxy listening");
   } catch (error) {
     app.log.error(error, "Failed to start server");
     process.exit(1);
