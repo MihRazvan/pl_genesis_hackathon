@@ -7,7 +7,7 @@ Cloakline is a drop-in privacy RPC for Ethereum that reduces wallet surveillance
 
 It routes wallet traffic through a privacy-preserving RPC layer and uses **Zama fhEVM** to keep operational logging **encrypted, pseudonymous, and write-only**.
 
-[Landing Page](https://cloakline.xyz) | [RPC Endpoint](https://rpc.cloakline.xyz)
+[Website](https://cloakline.xyz) | [RPC Endpoint](https://rpc.cloakline.xyz)
 
 ---
 
@@ -36,10 +36,10 @@ Cloakline is a privacy-focused RPC layer for Ethereum.
 
 It sits between the wallet and the upstream provider, forwards requests through a cleaner trust boundary, and logs selected operational signals on-chain through fhEVM as encrypted counts under salted pseudonymous bucket IDs.
 
-## Core ideas
+## Core Principles
 
 1. **ONE RPC SWITCH**
-Users should be able to adopt Cloakline by changing the RPC endpoint in an existing wallet.
+Use the same wallet. Change the RPC endpoint.
 
 2. **LOWER LINKAGE RISK**
 The upstream provider sees Cloakline as the request path instead of the same direct client-origin relationship.
@@ -49,6 +49,21 @@ The logging layer stores salted pseudonymous bucket IDs, not raw addresses.
 
 4. **WRITE-ONLY ENCRYPTED LOGGING**
 Cloakline can write usage counts on-chain, but it cannot decrypt the accumulated history later.
+
+---
+
+# Website
+
+The easiest way to try Cloakline is through the public website:
+
+## https://cloakline.xyz
+
+That site is the product entry point. It is where users and judges can:
+
+- understand the problem quickly
+- add the Cloakline RPC to a wallet
+- copy the manual RPC details if needed
+- see the live product surface instead of only the repository
 
 ---
 
@@ -95,7 +110,7 @@ That separation of write authority from read authority is the most distinctive p
 5. The logging contract stores encrypted counts by salted pseudonymous bucket ID.
 6. The logger can write those counts, but cannot decrypt them back later.
 
-## Full flow
+## Full Flow
 
 `Wallet -> Cloakline RPC -> Upstream RPC -> fhEVM logging contract`
 
@@ -106,7 +121,7 @@ That separation of write authority from read authority is the most distinctive p
 | Component | Technology | Purpose |
 | --- | --- | --- |
 | RPC proxy | **Node.js / TypeScript / Fastify** | Request forwarding and sanitization |
-| Landing page | **React / Vite** | Product surface and wallet onboarding |
+| Website | **React / Vite** | Public product surface and wallet onboarding |
 | Wallet discovery | **mipd / EIP-6963** | Injected wallet detection |
 | Logging contract | **Zama fhEVM** | Encrypted write-only operational logging |
 | Contracts | **Hardhat** | Compile, test, deploy |
