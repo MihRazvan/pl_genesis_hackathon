@@ -1,0 +1,45 @@
+<svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+
+  <rect width="1200" height="400" fill="#f6f0e6"/>
+  <rect width="1200" height="400" fill="none" stroke="#17221c" stroke-width="3"/>
+
+  <rect x="0" y="0" width="1200" height="6" fill="#17221c"/>
+
+  <circle cx="72" cy="200" r="26" fill="#be6843" stroke="#17221c" stroke-width="2.5"/>
+  <rect x="63" y="192" width="8" height="16" rx="4" fill="#f6f0e6"/>
+  <rect x="77" y="188" width="8" height="20" rx="4" fill="#f6f0e6" opacity="0.6"/>
+
+  <text x="116" y="214" font-size="52" font-weight="700" fill="#17221c" letter-spacing="-2">Cloakline</text>
+
+  <line x1="116" y1="234" x2="680" y2="234" stroke="#17221c" stroke-width="1.5" opacity="0.2"/>
+
+  <text x="116" y="270" font-size="22" fill="#35596a" font-weight="500" letter-spacing="0.02em">A drop-in privacy RPC for Ethereum</text>
+  <text x="116" y="304" font-size="18" fill="#888" font-weight="400">One RPC switch. Less wallet surveillance.</text>
+
+  <rect x="116" y="330" width="200" height="42" rx="12" fill="#17221c" stroke="#17221c" stroke-width="2"/>
+  <text x="216" y="357" font-size="15" font-weight="700" fill="#f6f0e6" text-anchor="middle" letter-spacing="0.04em">cloakline.xyz</text>
+
+  <rect x="334" y="330" width="190" height="42" rx="12" fill="none" stroke="#17221c" stroke-width="2"/>
+  <text x="429" y="357" font-size="15" font-weight="700" fill="#17221c" text-anchor="middle" letter-spacing="0.04em">Add to Wallet</text>
+
+  <rect x="820" y="80" width="300" height="240" rx="20" fill="#17221c" stroke="#2a3a2e" stroke-width="2"/>
+  <text x="970" y="118" font-size="11" font-weight="700" fill="#4a7055" text-anchor="middle" letter-spacing="0.12em">SEPOLIA VIA CLOAKLINE</text>
+  <rect x="846" y="132" width="248" height="1" fill="#2a3a2e"/>
+
+  <rect x="856" y="152" width="228" height="48" rx="10" fill="#1a2820"/>
+  <circle cx="876" cy="176" r="14" fill="#be6843" opacity="0.3" stroke="#be6843" stroke-width="1.5"/>
+  <text x="876" y="181" font-size="10" font-weight="700" fill="#be6843" text-anchor="middle">RZ</text>
+  <text x="898" y="170" font-size="11" font-weight="700" fill="#c8d8c8">0x93B2...023F7</text>
+  <text x="898" y="186" font-size="10" fill="#4a6a5a">Sepolia via Cloakline</text>
+
+  <text x="856" y="228" font-size="10" fill="#4a6a5a" font-weight="700" letter-spacing="0.1em">AMOUNT</text>
+  <text x="1084" y="228" font-size="13" fill="#c8d8b8" font-weight="700" text-anchor="end">0.001 ETH</text>
+  <text x="856" y="252" font-size="10" fill="#4a6a5a" font-weight="700" letter-spacing="0.1em">GAS</text>
+  <text x="1084" y="252" font-size="12" fill="#7a9a7a" text-anchor="end">~0.00004 ETH</text>
+
+  <rect x="856" y="268" width="1" height="1" fill="none"/>
+  <rect x="845" y="272" width="108" height="36" rx="9" fill="#1a2820" stroke="#2a3a2e" stroke-width="1.5"/>
+  <text x="899" y="295" font-size="12" fill="#4a6a5a" font-weight="700" text-anchor="middle">Reject</text>
+  <rect x="961" y="272" width="108" height="36" rx="9" fill="#1e3a1e" stroke="#3a6a3a" stroke-width="1.5"/>
+  <text x="1015" y="295" font-size="12" fill="#6aaa6a" font-weight="700" text-anchor="middle">Confirm</text>
+</svg>

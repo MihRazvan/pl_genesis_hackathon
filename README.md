@@ -1,7 +1,6 @@
 # CLOAKLINE
 
-<!-- Optional banner / hero visual goes here -->
-<!-- Example: ![Cloakline banner](./docs/banner.png) -->
+![Cloakline hero](./Images/cloakline_readme_hero.svg)
 
 Cloakline is a drop-in privacy RPC for Ethereum that reduces wallet surveillance risk with one RPC switch.
 
@@ -15,14 +14,14 @@ It routes wallet traffic through a privacy-preserving RPC layer and uses **Zama 
 
 Modern wallet traffic is still surprisingly easy to profile.
 
-In the normal setup, wallets talk directly to upstream RPC providers. That creates a simple place to accumulate a dossier:
+In the normal setup, wallets talk directly to upstream RPC providers. That creates an easy place to accumulate a dossier:
 
 - which wallet-related methods were called
 - which addresses were queried
 - when the user was active
 - which direct client path the traffic came from
 
-Over time, that makes wallet-linked surveillance easier than it should be.
+Over time, that makes wallet-linked surveillance far easier than it should be.
 
 **Cloakline** exists to reduce that linkage surface without forcing users into a new wallet or a new transaction flow.
 
@@ -50,6 +49,8 @@ The logging layer stores salted pseudonymous bucket IDs, not raw addresses.
 4. **WRITE-ONLY ENCRYPTED LOGGING**
 Cloakline can write usage counts on-chain, but it cannot decrypt the accumulated history later.
 
+![Cloakline privacy model](./Images/cloakline_readme_trust.svg)
+
 ---
 
 # Website
@@ -58,12 +59,12 @@ The easiest way to try Cloakline is through the public website:
 
 ## https://cloakline.xyz
 
-That site is the product entry point. It is where users and judges can:
+That is the main product surface. It is where people can:
 
-- understand the problem quickly
+- understand the product quickly
 - add the Cloakline RPC to a wallet
 - copy the manual RPC details if needed
-- see the live product surface instead of only the repository
+- use the live website instead of only reading the repository
 
 ---
 
@@ -91,8 +92,7 @@ That separation of write authority from read authority is the most distinctive p
 
 # How It Works
 
-<!-- Optional architecture visual / Excalidraw goes here -->
-<!-- Example: ![Technical architecture](./docs/architecture.png) -->
+![Cloakline flow](./Images/cloakline_readme_flow.svg)
 
 ## Without Cloakline
 

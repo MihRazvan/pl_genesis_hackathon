@@ -1,0 +1,67 @@
+<svg viewBox="0 0 1200 340" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+
+  <rect width="1200" height="340" fill="#f6f0e6"/>
+  <rect width="1200" height="340" fill="none" stroke="#17221c" stroke-width="3"/>
+
+  <text x="600" y="52" font-size="13" font-weight="700" fill="#be6843" text-anchor="middle" letter-spacing="0.14em">HOW IT WORKS</text>
+
+  <!-- WALLET NODE -->
+  <rect x="60" y="110" width="180" height="120" rx="16" fill="#dce6ea" stroke="#17221c" stroke-width="2"/>
+  <text x="150" y="162" font-size="13" font-weight="700" fill="#35596a" text-anchor="middle" letter-spacing="0.1em">YOUR WALLET</text>
+  <text x="150" y="183" font-size="12" fill="#5a7a8a" text-anchor="middle">Rabby / MetaMask</text>
+  <text x="150" y="204" font-size="11" fill="#7a9aaa" text-anchor="middle">no changes needed</text>
+
+  <!-- ARROW 1 -->
+  <line x1="241" y1="170" x2="329" y2="170" stroke="#17221c" stroke-width="2"/>
+  <polygon points="329,165 340,170 329,175" fill="#17221c"/>
+  <text x="290" y="156" font-size="11" fill="#888" text-anchor="middle">RPC call</text>
+
+  <!-- CLOAKLINE NODE — larger, accented -->
+  <rect x="340" y="90" width="220" height="160" rx="16" fill="#17221c" stroke="#be6843" stroke-width="2.5"/>
+  <text x="450" y="132" font-size="13" font-weight="700" fill="#be6843" text-anchor="middle" letter-spacing="0.12em">CLOAKLINE</text>
+  <rect x="360" y="142" width="180" height="1" fill="#2a3a2e"/>
+  <text x="450" y="163" font-size="11" fill="#6aaa6a" text-anchor="middle">strips client headers</text>
+  <text x="450" y="181" font-size="11" fill="#6aaa6a" text-anchor="middle">forwards to upstream</text>
+  <text x="450" y="199" font-size="11" fill="#a07acc" text-anchor="middle">logs encrypted counts</text>
+  <text x="450" y="217" font-size="11" fill="#a07acc" text-anchor="middle">via fhEVM on Sepolia</text>
+
+  <!-- ARROW 2 -->
+  <line x1="561" y1="170" x2="649" y2="170" stroke="#17221c" stroke-width="2"/>
+  <polygon points="649,165 660,170 649,175" fill="#17221c"/>
+  <text x="610" y="156" font-size="11" fill="#888" text-anchor="middle">forwarded</text>
+
+  <!-- UPSTREAM NODE -->
+  <rect x="660" y="110" width="180" height="120" rx="16" fill="#c4d7c4" stroke="#17221c" stroke-width="2"/>
+  <text x="750" y="158" font-size="13" font-weight="700" fill="#2d5c2d" text-anchor="middle" letter-spacing="0.1em">UPSTREAM RPC</text>
+  <text x="750" y="179" font-size="12" fill="#4a7a4a" text-anchor="middle">sees cloakline/0.1</text>
+  <text x="750" y="200" font-size="11" fill="#6a9a6a" text-anchor="middle">not your client</text>
+
+  <!-- RETURN ARROW -->
+  <line x1="660" y1="192" x2="562" y2="192" stroke="#35596a" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <polygon points="562,187 551,192 562,197" fill="#35596a"/>
+  <line x1="340" y1="192" x2="242" y2="192" stroke="#35596a" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <polygon points="242,187 231,192 242,197" fill="#35596a"/>
+  <text x="610" y="216" font-size="11" fill="#35596a" text-anchor="middle">same result</text>
+  <text x="288" y="216" font-size="11" fill="#35596a" text-anchor="middle">returned</text>
+
+  <!-- FHEVM BRANCH -->
+  <line x1="450" y1="250" x2="450" y2="282" stroke="#a07acc" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="445,282 450,293 455,282" fill="#a07acc"/>
+
+  <rect x="330" y="293" width="240" height="30" rx="8" fill="#1a0a2a" stroke="#a07acc" stroke-width="1.5"/>
+  <text x="450" y="313" font-size="11" font-weight="700" fill="#a07acc" text-anchor="middle">PrivateQueryLog.sol · fhEVM · Sepolia</text>
+
+  <!-- RIGHT SIDE CALLOUT -->
+  <rect x="900" y="90" width="260" height="160" rx="16" fill="#fffaf2" stroke="#17221c" stroke-width="2"/>
+  <text x="1030" y="120" font-size="11" font-weight="700" fill="#17221c" text-anchor="middle" letter-spacing="0.1em">WHAT CHANGES</text>
+  <rect x="920" y="128" width="220" height="1" fill="#e0d8cc"/>
+
+  <circle cx="928" cy="150" r="4" fill="#e87848"/>
+  <text x="940" y="155" font-size="11" fill="#17221c">Upstream sees Cloakline, not you</text>
+  <circle cx="928" cy="174" r="4" fill="#6aaa6a"/>
+  <text x="940" y="179" font-size="11" fill="#17221c">Client headers stripped</text>
+  <circle cx="928" cy="198" r="4" fill="#a07acc"/>
+  <text x="940" y="203" font-size="11" fill="#17221c">Counts encrypted on-chain</text>
+  <circle cx="928" cy="222" r="4" fill="#6aaa6a"/>
+  <text x="940" y="227" font-size="11" fill="#17221c">Raw wallet address never stored</text>
+</svg>
