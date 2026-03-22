@@ -1,6 +1,6 @@
 # CLOAKLINE
 
-![Cloakline hero](./Images/cloakline_readme_hero.png)
+![Cloakline hero](./images/cloakline_readme_hero.png)
 
 Cloakline is a drop-in privacy RPC for Ethereum that reduces wallet surveillance risk with one RPC switch.
 
@@ -49,7 +49,7 @@ The logging layer stores salted pseudonymous bucket IDs, not raw addresses.
 4. **WRITE-ONLY ENCRYPTED LOGGING**
 Cloakline can write usage counts on-chain, but it cannot decrypt the accumulated history later.
 
-![Cloakline privacy model](./Images/cloakline_readme_trust.png)
+![Cloakline privacy model](./images/cloakline_readme_trust.png)
 
 ---
 
@@ -92,7 +92,7 @@ That separation of write authority from read authority is the most distinctive p
 
 # How It Works
 
-![Cloakline flow](./Images/cloakline_readme_flow.png)
+![Cloakline flow](./images/cloakline_readme_flow.png)
 
 ## Without Cloakline
 
