@@ -459,6 +459,52 @@ section {
   font-size: 2rem;
 }
 
+.detected-note {
+  margin: 0 0 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--navy);
+}
+
+.wallet-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 1.2rem;
+}
+
+.wallet-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 0.9rem;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.72);
+  cursor: pointer;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.wallet-option img,
+.wallet-dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  flex: none;
+}
+
+.wallet-dot {
+  background: var(--clay);
+}
+
+.wallet-option.active {
+  background: rgba(190, 104, 67, 0.16);
+  box-shadow: 0 3px 0 rgba(23, 34, 28, 0.18);
+}
+
 .field-list {
   display: grid;
   gap: 1rem;

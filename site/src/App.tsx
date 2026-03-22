@@ -7,20 +7,29 @@ import {
   ShieldCheck,
   Sparkles
 } from "lucide-react";
+import { createStore, type EIP1193Provider, type EIP6963ProviderDetail } from "mipd";
 import { useEffect, useState } from "react";
 import { manualFields, siteConfig } from "./siteConfig";
 
-type EthereumProvider = {
+type InjectedProvider = EIP1193Provider & {
   isMetaMask?: boolean;
   isRabby?: boolean;
-  providers?: EthereumProvider[];
-  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+  isCoinbaseWallet?: boolean;
+  providers?: InjectedProvider[];
 };
 
-function getInjectedProvider(): EthereumProvider | undefined {
+type WalletOption = {
+  id: string;
+  name: string;
+  icon?: string;
+  provider: EIP1193Provider;
+  source: "eip6963" | "fallback";
+};
+
+function getFallbackInjectedProvider(): InjectedProvider | undefined {
   const maybeWindow = window as Window & {
-    ethereum?: EthereumProvider;
-    rabby?: { ethereum?: EthereumProvider };
+    ethereum?: InjectedProvider;
+    rabby?: { ethereum?: InjectedProvider };
   };
 
   if (maybeWindow.rabby?.ethereum) {
@@ -34,13 +43,51 @@ function getInjectedProvider(): EthereumProvider | undefined {
 
   if (Array.isArray(ethereum.providers) && ethereum.providers.length > 0) {
     return (
-      ethereum.providers.find((provider) => provider.isRabby) ??
-      ethereum.providers.find((provider) => provider.isMetaMask) ??
+      ethereum.providers.find((provider: InjectedProvider) => provider.isRabby) ??
+      ethereum.providers.find((provider: InjectedProvider) => provider.isMetaMask) ??
+      ethereum.providers.find((provider: InjectedProvider) => provider.isCoinbaseWallet) ??
       ethereum.providers[0]
     );
   }
 
   return ethereum;
+}
+
+function getFallbackWalletName(provider: InjectedProvider): string {
+  if (provider.isRabby) {
+    return "Rabby";
+  }
+  if (provider.isMetaMask) {
+    return "MetaMask";
+  }
+  if (provider.isCoinbaseWallet) {
+    return "Coinbase Wallet";
+  }
+
+  return "Injected Wallet";
+}
+
+function toWalletOptions(providerDetails: readonly EIP6963ProviderDetail[]): WalletOption[] {
+  return providerDetails.map((detail) => ({
+    id: detail.info.uuid,
+    name: detail.info.name,
+    icon: detail.info.icon,
+    provider: detail.provider,
+    source: "eip6963"
+  }));
+}
+
+function pickPreferredWallet(options: WalletOption[]): WalletOption | undefined {
+  if (options.length === 0) {
+    return undefined;
+  }
+
+  return (
+    options.find((option) => option.name.toLowerCase().includes("rabby")) ??
+    options.find((option) => option.name.toLowerCase().includes("metamask")) ??
+    options.find((option) => option.name.toLowerCase().includes("coinbase")) ??
+    options[0]
+  );
 }
 
 const faqs = [
@@ -74,27 +121,64 @@ const faqs = [
 function App() {
   const [copyState, setCopyState] = useState<string | null>(null);
   const [walletState, setWalletState] = useState<string | null>(null);
-  const [provider, setProvider] = useState<EthereumProvider | undefined>(() =>
-    typeof window === "undefined" ? undefined : getInjectedProvider()
-  );
+  const [walletOptions, setWalletOptions] = useState<WalletOption[]>([]);
+  const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
 
   useEffect(() => {
-    function refreshProvider() {
-      setProvider(getInjectedProvider());
+    const store = createStore();
+
+    function refreshWalletOptions(providerDetails: readonly EIP6963ProviderDetail[]) {
+      const discoveredWallets = toWalletOptions(providerDetails);
+
+      if (discoveredWallets.length > 0) {
+        setWalletOptions(discoveredWallets);
+        setSelectedWalletId((current) => {
+          if (current && discoveredWallets.some((wallet) => wallet.id === current)) {
+            return current;
+          }
+
+          return pickPreferredWallet(discoveredWallets)?.id ?? null;
+        });
+        return;
+      }
+
+      const fallbackProvider = getFallbackInjectedProvider();
+      if (fallbackProvider) {
+        const fallbackWallet = {
+          id: "fallback-injected-wallet",
+          name: getFallbackWalletName(fallbackProvider),
+          provider: fallbackProvider,
+          source: "fallback" as const
+        };
+
+        setWalletOptions([fallbackWallet]);
+        setSelectedWalletId(fallbackWallet.id);
+        return;
+      }
+
+      setWalletOptions([]);
+      setSelectedWalletId(null);
     }
 
-    refreshProvider();
-    window.addEventListener("ethereum#initialized", refreshProvider as EventListener, {
-      once: true
+    const unsubscribe = store.subscribe((providerDetails) => {
+      refreshWalletOptions(providerDetails);
+    }, {
+      emitImmediately: true
     });
 
-    const timeoutId = window.setTimeout(refreshProvider, 800);
+    const timeoutId = window.setTimeout(() => {
+      refreshWalletOptions(store.getProviders());
+    }, 900);
 
     return () => {
-      window.removeEventListener("ethereum#initialized", refreshProvider as EventListener);
+      unsubscribe();
+      store.destroy();
       window.clearTimeout(timeoutId);
     };
   }, []);
+
+  const selectedWallet =
+    walletOptions.find((wallet) => wallet.id === selectedWalletId) ?? walletOptions[0];
 
   async function copyValue(label: string, value: string) {
     try {
@@ -108,11 +192,11 @@ function App() {
   }
 
   async function addToWallet() {
-    const injectedProvider = provider ?? getInjectedProvider();
+    const injectedProvider = selectedWallet?.provider ?? getFallbackInjectedProvider();
 
     if (!injectedProvider) {
       setWalletState(
-        "No injected wallet detected. Open this page in a browser with Rabby or MetaMask enabled, or use the manual RPC details instead."
+        "No injected wallet detected. Open this page in a browser with a wallet extension enabled, or use the manual RPC details instead."
       );
       return;
     }
@@ -134,9 +218,13 @@ function App() {
           }
         ]
       });
-      setWalletState("Wallet request opened. Check your wallet extension.");
+      setWalletState(
+        `Wallet request opened${selectedWallet ? ` in ${selectedWallet.name}` : ""}. Check your extension.`
+      );
     } catch {
-      setWalletState("Wallet request was rejected or not supported by the detected provider.");
+      setWalletState(
+        `Wallet request was rejected or not supported${selectedWallet ? ` by ${selectedWallet.name}` : ""}.`
+      );
     }
   }
 
@@ -264,8 +352,26 @@ function App() {
                 <span>One-click wallet setup</span>
               </div>
               <p className="starter-network">{siteConfig.rpc.chainName}</p>
+              {walletOptions.length > 0 ? (
+                <>
+                  <p className="detected-note">Detected wallets</p>
+                  <div className="wallet-options" role="list" aria-label="Detected wallets">
+                    {walletOptions.map((wallet) => (
+                      <button
+                        key={wallet.id}
+                        type="button"
+                        className={`wallet-option${wallet.id === selectedWallet?.id ? " active" : ""}`}
+                        onClick={() => setSelectedWalletId(wallet.id)}
+                      >
+                        {wallet.icon ? <img src={wallet.icon} alt="" /> : <span className="wallet-dot" />}
+                        <span>{wallet.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : null}
               <button className="button button-primary button-wide" onClick={addToWallet}>
-                Add to wallet
+                {selectedWallet ? `Add to ${selectedWallet.name}` : "Add to wallet"}
               </button>
               <p className="starter-note">
                 {siteConfig.isPlaceholderRpc
