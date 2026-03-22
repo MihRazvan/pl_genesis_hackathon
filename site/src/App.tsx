@@ -8,26 +8,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { useState } from "react";
-
-const rpcConfig = {
-  chainId: "0xaa36a7",
-  chainName: "Sepolia via Cloakline",
-  rpcUrls: ["https://rpc.cloakline.xyz/sepolia"],
-  nativeCurrency: {
-    name: "Sepolia Ether",
-    symbol: "ETH",
-    decimals: 18
-  },
-  blockExplorerUrls: ["https://sepolia.etherscan.io"]
-};
-
-const manualFields = [
-  { label: "Network Name", value: "Sepolia via Cloakline" },
-  { label: "New RPC URL", value: "https://rpc.cloakline.xyz/sepolia" },
-  { label: "Chain ID", value: "11155111" },
-  { label: "Currency Symbol", value: "ETH" },
-  { label: "Block Explorer URL", value: "https://sepolia.etherscan.io" }
-];
+import { manualFields, siteConfig } from "./siteConfig";
 
 const faqs = [
   {
@@ -87,7 +68,19 @@ function App() {
     try {
       await ethereum.request({
         method: "wallet_addEthereumChain",
-        params: [rpcConfig]
+        params: [
+          {
+            chainId: siteConfig.rpc.chainIdHex,
+            chainName: siteConfig.rpc.chainName,
+            rpcUrls: [siteConfig.rpc.rpcUrl],
+            nativeCurrency: {
+              name: siteConfig.rpc.currencyName,
+              symbol: siteConfig.rpc.currencySymbol,
+              decimals: 18
+            },
+            blockExplorerUrls: [siteConfig.rpc.explorerUrl]
+          }
+        ]
       });
       setWalletState("Wallet request opened.");
     } catch {
@@ -218,13 +211,14 @@ function App() {
                 <Sparkles size={20} />
                 <span>One-click wallet setup</span>
               </div>
-              <p className="starter-network">Sepolia via Cloakline</p>
+              <p className="starter-network">{siteConfig.rpc.chainName}</p>
               <button className="button button-primary button-wide" onClick={addToWallet}>
                 Add to wallet
               </button>
               <p className="starter-note">
-                Best demo path: show the wallet prompt, switch the RPC, then send a normal Sepolia
-                transaction through Cloakline.
+                {siteConfig.isPlaceholderRpc
+                  ? "This card is wired for a placeholder endpoint right now. Swap the site env to your live RPC before the public deploy."
+                  : "Best demo path: show the wallet prompt, switch the RPC, then send a normal transaction through Cloakline."}
               </p>
               {walletState ? <p className="status-note">{walletState}</p> : null}
             </article>

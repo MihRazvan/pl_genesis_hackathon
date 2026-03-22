@@ -20,11 +20,12 @@ Implemented:
 ## Landing page quick start
 
 ```bash
+cp site/.env.example site/.env
 pnpm site:dev
 pnpm site:build
 ```
 
-The landing page lives in `site/` and is currently wired with placeholder RPC values for deployment later.
+The landing page lives in `site/` and reads wallet/RPC values from `site/.env` via `VITE_*` variables.
 
 ## Proxy quick start
 
