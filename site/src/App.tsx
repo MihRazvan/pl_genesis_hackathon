@@ -341,8 +341,7 @@ function App() {
             <h2>Add Cloakline to your wallet.</h2>
             <p>
               Use the wallet button if your browser wallet supports network injection, or copy the
-              manual fields below. The endpoint is a placeholder for now and will be swapped for
-              the live deployment later.
+              manual fields below to add Cloakline manually.
             </p>
           </div>
           <div className="starter-grid">
@@ -374,9 +373,7 @@ function App() {
                 {selectedWallet ? `Add to ${selectedWallet.name}` : "Add to wallet"}
               </button>
               <p className="starter-note">
-                {siteConfig.isPlaceholderRpc
-                  ? "This card is wired for a placeholder endpoint right now. Swap the site env to your live RPC before the public deploy."
-                  : "Best demo path: show the wallet prompt, switch the RPC, then send a normal transaction through Cloakline."}
+                Add the Cloakline RPC in one step, then keep using your wallet normally.
               </p>
               {walletState ? <p className="status-note">{walletState}</p> : null}
             </article>
