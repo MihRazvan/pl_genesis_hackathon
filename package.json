@@ -4,6 +4,7 @@
   "private": true,
   "description": "Cloakline: privacy-preserving Ethereum RPC for unlinkability and write-only encrypted logging",
   "type": "module",
+  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "dev": "tsx watch proxy/src/server.ts",
     "start": "tsx proxy/src/server.ts",
@@ -24,7 +25,7 @@
     "contracts:deploy:sepolia": "pnpm --dir contracts deploy:sepolia"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "22.x"
   },
   "dependencies": {
     "@fontsource/fraunces": "^5.2.9",
