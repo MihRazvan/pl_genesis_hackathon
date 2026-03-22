@@ -7,8 +7,41 @@ import {
   ShieldCheck,
   Sparkles
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { manualFields, siteConfig } from "./siteConfig";
+
+type EthereumProvider = {
+  isMetaMask?: boolean;
+  isRabby?: boolean;
+  providers?: EthereumProvider[];
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+};
+
+function getInjectedProvider(): EthereumProvider | undefined {
+  const maybeWindow = window as Window & {
+    ethereum?: EthereumProvider;
+    rabby?: { ethereum?: EthereumProvider };
+  };
+
+  if (maybeWindow.rabby?.ethereum) {
+    return maybeWindow.rabby.ethereum;
+  }
+
+  const ethereum = maybeWindow.ethereum;
+  if (!ethereum) {
+    return undefined;
+  }
+
+  if (Array.isArray(ethereum.providers) && ethereum.providers.length > 0) {
+    return (
+      ethereum.providers.find((provider) => provider.isRabby) ??
+      ethereum.providers.find((provider) => provider.isMetaMask) ??
+      ethereum.providers[0]
+    );
+  }
+
+  return ethereum;
+}
 
 const faqs = [
   {
@@ -41,6 +74,27 @@ const faqs = [
 function App() {
   const [copyState, setCopyState] = useState<string | null>(null);
   const [walletState, setWalletState] = useState<string | null>(null);
+  const [provider, setProvider] = useState<EthereumProvider | undefined>(() =>
+    typeof window === "undefined" ? undefined : getInjectedProvider()
+  );
+
+  useEffect(() => {
+    function refreshProvider() {
+      setProvider(getInjectedProvider());
+    }
+
+    refreshProvider();
+    window.addEventListener("ethereum#initialized", refreshProvider as EventListener, {
+      once: true
+    });
+
+    const timeoutId = window.setTimeout(refreshProvider, 800);
+
+    return () => {
+      window.removeEventListener("ethereum#initialized", refreshProvider as EventListener);
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   async function copyValue(label: string, value: string) {
     try {
@@ -54,19 +108,17 @@ function App() {
   }
 
   async function addToWallet() {
-    const ethereum = (window as Window & {
-      ethereum?: {
-        request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      };
-    }).ethereum;
+    const injectedProvider = provider ?? getInjectedProvider();
 
-    if (!ethereum) {
-      setWalletState("No injected wallet detected. Use the manual RPC details instead.");
+    if (!injectedProvider) {
+      setWalletState(
+        "No injected wallet detected. Open this page in a browser with Rabby or MetaMask enabled, or use the manual RPC details instead."
+      );
       return;
     }
 
     try {
-      await ethereum.request({
+      await injectedProvider.request({
         method: "wallet_addEthereumChain",
         params: [
           {
@@ -82,9 +134,9 @@ function App() {
           }
         ]
       });
-      setWalletState("Wallet request opened.");
+      setWalletState("Wallet request opened. Check your wallet extension.");
     } catch {
-      setWalletState("Wallet request was rejected or not supported.");
+      setWalletState("Wallet request was rejected or not supported by the detected provider.");
     }
   }
 
