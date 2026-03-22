@@ -142,6 +142,7 @@ function App() {
   const [walletState, setWalletState] = useState<string | null>(null);
   const [walletOptions, setWalletOptions] = useState<WalletOption[]>([]);
   const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
+  const [walletActionPending, setWalletActionPending] = useState(false);
 
   useEffect(() => {
     const store = createStore();
@@ -228,7 +229,13 @@ function App() {
       return;
     }
 
+    setWalletActionPending(true);
+
     try {
+      await injectedProvider.request({
+        method: "eth_requestAccounts"
+      });
+
       await injectedProvider.request({
         method: "wallet_addEthereumChain",
         params: [
@@ -246,12 +253,23 @@ function App() {
         ]
       });
       setWalletState(
-        `Network request sent${selectedWallet ? ` to ${selectedWallet.name}` : ""}. If no prompt appears, the chain may already exist in your wallet and you can switch the RPC URL manually.`
+        `Connected${selectedWallet ? ` to ${selectedWallet.name}` : ""} and sent the network request. If no prompt appears, the chain may already exist in your wallet and you can switch the RPC URL manually.`
       );
-    } catch {
-      setWalletState(
-        `Wallet request was rejected or not supported${selectedWallet ? ` by ${selectedWallet.name}` : ""}. Use the manual RPC details below to finish setup.`
-      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : typeof error === "string" ? error : "";
+
+      if (message.includes("User rejected") || message.includes("4001")) {
+        setWalletState(
+          `Wallet connection or network request was rejected${selectedWallet ? ` by ${selectedWallet.name}` : ""}. Use the manual RPC details below to finish setup.`
+        );
+      } else {
+        setWalletState(
+          `Automatic setup was not completed${selectedWallet ? ` in ${selectedWallet.name}` : ""}. The wallet may already know this chain, so use the manual RPC details below to switch the RPC URL.`
+        );
+      }
+    } finally {
+      setWalletActionPending(false);
     }
   }
 
@@ -399,6 +417,8 @@ function App() {
               <button className="button button-primary button-wide" onClick={addToWallet}>
                 {walletKind === "metamask"
                   ? "Show MetaMask steps"
+                  : walletActionPending
+                    ? "Waiting for wallet..."
                   : selectedWallet
                     ? `Add to ${selectedWallet.name}`
                     : "Add to wallet"}
