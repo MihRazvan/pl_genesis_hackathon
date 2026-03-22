@@ -26,6 +26,25 @@ type WalletOption = {
   source: "eip6963" | "fallback";
 };
 
+function getWalletKind(wallet?: WalletOption): "metamask" | "rabby" | "coinbase" | "other" | "none" {
+  if (!wallet) {
+    return "none";
+  }
+
+  const name = wallet.name.toLowerCase();
+  if (name.includes("metamask")) {
+    return "metamask";
+  }
+  if (name.includes("rabby")) {
+    return "rabby";
+  }
+  if (name.includes("coinbase")) {
+    return "coinbase";
+  }
+
+  return "other";
+}
+
 function getFallbackInjectedProvider(): InjectedProvider | undefined {
   const maybeWindow = window as Window & {
     ethereum?: InjectedProvider;
@@ -114,7 +133,7 @@ const faqs = [
   {
     question: "Do I need a new wallet?",
     answer:
-      "No. The goal is one-click adoption: add one RPC endpoint to your existing wallet and keep the normal flow."
+      "No. The goal is one RPC switch: point your existing wallet at Cloakline and keep the normal flow."
   }
 ];
 
@@ -179,6 +198,7 @@ function App() {
 
   const selectedWallet =
     walletOptions.find((wallet) => wallet.id === selectedWalletId) ?? walletOptions[0];
+  const walletKind = getWalletKind(selectedWallet);
 
   async function copyValue(label: string, value: string) {
     try {
@@ -201,6 +221,13 @@ function App() {
       return;
     }
 
+    if (walletKind === "metamask") {
+      setWalletState(
+        "MetaMask already knows Sepolia. Edit the existing Sepolia RPC URL and replace it with Cloakline instead of adding a second Sepolia network."
+      );
+      return;
+    }
+
     try {
       await injectedProvider.request({
         method: "wallet_addEthereumChain",
@@ -219,11 +246,11 @@ function App() {
         ]
       });
       setWalletState(
-        `Wallet request opened${selectedWallet ? ` in ${selectedWallet.name}` : ""}. Check your extension.`
+        `Network request sent${selectedWallet ? ` to ${selectedWallet.name}` : ""}. If no prompt appears, the chain may already exist in your wallet and you can switch the RPC URL manually.`
       );
     } catch {
       setWalletState(
-        `Wallet request was rejected or not supported${selectedWallet ? ` by ${selectedWallet.name}` : ""}.`
+        `Wallet request was rejected or not supported${selectedWallet ? ` by ${selectedWallet.name}` : ""}. Use the manual RPC details below to finish setup.`
       );
     }
   }
@@ -370,11 +397,27 @@ function App() {
                 </>
               ) : null}
               <button className="button button-primary button-wide" onClick={addToWallet}>
-                {selectedWallet ? `Add to ${selectedWallet.name}` : "Add to wallet"}
+                {walletKind === "metamask"
+                  ? "Show MetaMask steps"
+                  : selectedWallet
+                    ? `Add to ${selectedWallet.name}`
+                    : "Add to wallet"}
               </button>
               <p className="starter-note">
-                Add the Cloakline RPC in one step, then keep using your wallet normally.
+                Switch one RPC endpoint, then keep using your wallet normally.
               </p>
+              {walletKind === "metamask" ? (
+                <p className="starter-note">
+                  MetaMask already includes Sepolia, so the clean setup path is to edit Sepolia and
+                  replace its RPC URL with Cloakline.
+                </p>
+              ) : null}
+              {walletKind === "rabby" ? (
+                <p className="starter-note">
+                  Rabby can usually open the network prompt directly. If the prompt does not appear,
+                  the network may already exist and you can switch the RPC URL manually.
+                </p>
+              ) : null}
               {walletState ? <p className="status-note">{walletState}</p> : null}
             </article>
 
