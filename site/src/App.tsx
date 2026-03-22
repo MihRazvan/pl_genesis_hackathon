@@ -497,7 +497,7 @@ function App() {
         <section className="faq section-mint" id="faq">
           <div className="section-head narrow">
             <p className="eyebrow">FAQ</p>
-            <h2>Questions judges will probably ask first.</h2>
+            <h2>Common questions.</h2>
           </div>
           <div className="faq-list">
             {faqs.map((item) => (

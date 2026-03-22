@@ -243,8 +243,8 @@ export function createQueryLogger(log: FastifyBaseLogger): QueryLogger {
   if (!isAddress(config.contractAddress)) {
     throw new Error("Invalid QUERY_LOG_CONTRACT_ADDRESS");
   }
-  if (config.userSalt.length < 16) {
-    throw new Error("QUERY_LOG_USER_SALT must be at least 16 characters");
+  if (config.userSalt.length < 32) {
+    throw new Error("QUERY_LOG_USER_SALT must be at least 32 characters");
   }
 
   const onchainLogger = new OnchainQueryLogger(
