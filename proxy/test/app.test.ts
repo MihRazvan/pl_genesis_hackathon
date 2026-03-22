@@ -6,6 +6,21 @@ afterEach(() => {
 });
 
 describe("RPC proxy", () => {
+  it("returns root status payload", async () => {
+    const app = buildApp({ upstreamUrls: ["https://example-rpc.test"] });
+
+    const response = await app.inject({ method: "GET", url: "/" });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({
+      name: "Cloakline",
+      ok: true,
+      message: "Cloakline RPC is running. Use POST / for JSON-RPC and GET /health for status.",
+      upstreams: 1
+    });
+    await app.close();
+  });
+
   it("returns health status", async () => {
     const app = buildApp({ upstreamUrls: ["https://example-rpc.test"] });
 

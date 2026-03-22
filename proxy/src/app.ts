@@ -19,6 +19,13 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
   const timeoutMs = options.timeoutMs ?? resolveTimeoutMs();
   const queryLogger = options.queryLogger ?? createQueryLogger(app.log);
 
+  app.get("/", async () => ({
+    name: "Cloakline",
+    ok: true,
+    message: "Cloakline RPC is running. Use POST / for JSON-RPC and GET /health for status.",
+    upstreams: upstreamUrls.length
+  }));
+
   app.get("/health", async () => ({
     ok: true,
     upstreams: upstreamUrls.length
