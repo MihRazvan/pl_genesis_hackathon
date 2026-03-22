@@ -7,7 +7,7 @@ Cloakline is a drop-in privacy RPC for Ethereum that reduces wallet surveillance
 
 It routes wallet traffic through a privacy-preserving RPC layer and uses **Zama fhEVM** to keep operational logging **encrypted, pseudonymous, and write-only**.
 
-[Landing Page](https://cloakline.xyz) | [RPC Endpoint](https://rpc.cloakline.xyz) | [MEV Blocker Inspiration Notes](./MEVBLOCKER_INSPIRATION_NOTES.md)
+[Landing Page](https://cloakline.xyz) | [RPC Endpoint](https://rpc.cloakline.xyz)
 
 ---
 
@@ -98,36 +98,6 @@ That separation of write authority from read authority is the most distinctive p
 ## Full flow
 
 `Wallet -> Cloakline RPC -> Upstream RPC -> fhEVM logging contract`
-
----
-
-# Trust Model
-
-This project is deliberately honest about its scope.
-
-## What is protected
-
-- Upstream providers no longer see the same direct user-to-provider path.
-- On-chain logging does not store raw wallet addresses.
-- Logged usage counts are encrypted with fhEVM.
-- The logger is write-only for those encrypted counts.
-
-## What is not protected
-
-- The Cloakline proxy still sees live metadata while forwarding requests.
-- Payload confidentiality from the proxy is **not** solved in this MVP.
-- Wallet analytics outside the RPC path are outside Cloakline's control.
-- This is **not** full anonymity.
-
-## Why this still matters
-
-The goal is not to pretend that every signal disappears.
-
-The goal is to make the easiest surveillance path weaker:
-
-- reduce direct provider-side linkage
-- reduce dossier accumulation risk
-- avoid publishing raw wallet identity in the on-chain logging layer
 
 ---
 
