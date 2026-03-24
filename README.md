@@ -8,7 +8,7 @@ Cloakline is a drop-in privacy RPC for Ethereum that reduces wallet surveillance
 
 It routes wallet traffic through a privacy-preserving RPC layer and uses **Zama fhEVM** to keep operational logging **encrypted, pseudonymous, and write-only**.
 
-**Project Summary & Requirements:** [SUMMARY.md](./SUMMARY.md)
+**Project Summary:** [SUMMARY.md](./SUMMARY.md)
 
 [Website](https://cloakline.xyz) | [RPC Endpoint](https://rpc.cloakline.xyz) | [Demo](https://youtu.be/vEnPyAWcX6Q) | [Verify](./VERIFY.md)
 
